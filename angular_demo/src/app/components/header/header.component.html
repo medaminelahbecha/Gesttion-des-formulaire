@@ -1,0 +1,45 @@
+<nav  class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <a class="navbar-brand" href="#">Gestion des compte</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active" >
+                <a class="nav-link" routerLink="/home">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item" *ngIf='isSuperAdmin | async'>
+                <a class="nav-link" routerLink="/role">Roles</a>
+            </li>
+            <li class="nav-item" *ngIf='isSuperAdmin | async'>
+                <a class="nav-link" routerLink="/users">Users</a>
+            </li>
+            <li class="nav-item" *ngIf='isLoggedIn' >
+                <a class="nav-link" routerLink="/etape">Etape</a>
+            </li>
+            <li class="nav-item" *ngIf='isLoggedIn' >
+                <a class="nav-link" routerLink="/transition">Transition</a>
+            </li>
+            <li class="nav-item" *ngIf='isLoggedIn' >
+                <a class="nav-link" routerLink="/formulaire">Formulaire</a>
+            </li>
+
+
+        </ul>
+
+        <ul class="navbar-nav my-2 my-lg-0">
+            
+            
+            <li class="nav-item" *ngIf='isLoggedIn'>
+                <a class="nav-link" (click)='logout()' routerLink="#">Logout</a>
+            </li>
+            <li class="nav-item" *ngIf='isLoggedIn'>
+                <a class="nav-link" routerLink="/login" routerLink="#">Login</a>
+            </li>
+            
+
+
+        </ul>
+    </div>
+</nav>

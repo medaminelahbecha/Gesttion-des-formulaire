@@ -1,0 +1,17 @@
+<div class="text-center mt-4">
+    <form class="form-signin border rounded" method="post" (submit)='login($event)' >
+        <img class="mb-4" src="assets/login.jpg" alt="" width="172" height="172">
+        <h1 class="h3 mb-3 font-weight-normal">Login To Your Application</h1>
+        <hr>
+       
+        <input type="text" id="inputUsername" class="form-control mb-2" placeholder="userName" name="username" required
+            autofocus>
+
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control mb-2" placeholder="Password" name="password" required>
+
+        <button  class="btn btn-lg btn-info border rounded btn-block mt-3" type="submit">Login</button>
+        <hr>
+         <a class="link-danger" href="/register">create an account </a>
+    </form>
+</div>

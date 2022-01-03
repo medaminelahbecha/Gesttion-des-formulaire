@@ -1,0 +1,91 @@
+<div class="category border m-2 p-4">
+    <h1 class="display-4">New Etape</h1>
+    <form #etapeForm action="javascript:void(0);" (submit)='saveEtape(etapeForm)' class="col-lg-8" method="POST">
+        <div class="form-group m-3">
+            <label for="name">Etape Name</label>
+            <input id="name" class="form-control" type="text" name="name" required/>
+        </div>
+
+        <div class="form-group m-3">
+            <label for="etapeFini"> Etape terminé</label>
+            <select id="etapeFini" class="form-control" name="etapeFini" required>
+                <option  value="true">Yes </option>
+                <option  value="false">No </option>
+            </select>
+        </div>
+
+        
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary col-lg-3">Save Etape</button>
+        </div>
+    </form>
+    <br>
+    <br>
+    <div *ngIf='error' class="alert alert-danger alert-dismissible fade show col-lg-3" role="alert">
+        <strong>{{error}}</strong> 
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    <div *ngIf='success' class="alert alert-success alert-dismissible fade show col-lg-3" role="alert">
+        <strong>{{success}}</strong> 
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+   
+</div>
+<div class="form-group col-lg-3">
+    <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="filterTerm" autofocus>
+  </div>
+  <br>
+<table class="table table-hover">
+    <thead style="background-color:slategray">
+        <tr>
+            <th>.Sno</th>
+            <th>Etape Name</th>
+            <th>Etape terminé</th>
+            
+            <th colspan="2">Action</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor='let etape of etapes | filter:filterTerm '>
+            <td>{{etape.idEtape}} </td>
+            <td>{{etape.nom}} </td>
+            <td>{{etape.etapeFini}} </td>
+            
+            
+            <td><button class="btn btn-success btn-sm" (click)='openModal(formModal,etape)' >Update Etape</button></td>
+            <td><button class="btn btn-danger btn-sm" (click)='deleteEtape(etape.idEtape)' >delete Etape</button></td>
+        </tr>
+    </tbody>
+
+</table>
+
+<ng-template #formModal>
+    <div class="container-fluid">
+        <form #updateForm action="javascript:void(0);" (submit)='updateEtape(updateForm)' class="p-4 m-3" method="POST">
+            <h1 class="display-6">Update Etape</h1>
+            <hr>
+            <div class="form-group m-3">
+                <label for="name">Etape Name</label>
+                <input id="name" class="form-control" type="text" name="name" value="{{selectedEtape.nom}}"/>
+            </div>
+            <div class="form-group m-3">
+                <label for="etapeFini"> Etape terminé</label>
+                <select id="etapeFini" class="form-control" name="etapeFini" value="{{selectedEtape.etapeFini}}">
+                    <option  value="true">Yes </option>
+                    <option  value="false">No </option>
+                </select>
+            </div>
+            <div class="mt-4 p-2 m-2">
+                <button type="submit" class="btn btn-info col-lg-5 ">Update Etape</button>
+            </div>
+        </form>
+
+
+    </div>
+</ng-template>

@@ -1,0 +1,15 @@
+<div class="text-center mt-4">
+    <form class="form-signin border rounded" method="post" (submit)='signup($event)' >
+        <img class="mb-4" src="assets/register.png" alt="" width="172" height="172">
+        <h1 class="h3 mb-3 font-weight-normal">Register To Your Application</h1>
+        <hr>
+       
+        <input type="text" id="inputUsername" class="form-control mb-2" placeholder="userName" name="username" required
+            autofocus>
+
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control mb-2" placeholder="Password" name="password" required>
+
+        <button  class="btn btn-lg btn-info border rounded btn-block mt-3" type="submit">Save</button>
+    </form>
+</div>
