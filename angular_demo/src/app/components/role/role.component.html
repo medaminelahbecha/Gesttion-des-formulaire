@@ -3,72 +3,88 @@
     <form #roleForm action="javascript:void(0);" (submit)='saveRole(roleForm)'  class="col-lg-8" method="POST">
         <div class="form-group">
             <label for="role">Role Name</label>
-            <input id="role" class="form-control" type="text" name="role" required />
+            <input id="role" class="form-control" type="text" pInputText   name="role" required  autofocus/>
         </div>
 
         <div class="mt-3">
-            <button type="submit" class="btn btn-primary col-lg-3">Save Role</button>
+            <button icon="pi pi-check" type="submit" label="Save Role" pButton pRipple class=" col-lg-3 " ></button>
         </div>
     </form>
     <br>
     <br>
-    <div *ngIf='error' class="alert alert-danger alert-dismissible fade show col-lg-3" role="alert">
-        <strong>{{error}}</strong> 
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    <div *ngIf='success' class="alert alert-success alert-dismissible fade show col-lg-3" role="alert">
-        <strong>{{success}}</strong> 
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+    
+    <p-toast  position="top-right" key="myKey1"></p-toast>
+    <p-toast  position="top-right" key="myKey2"></p-toast>
+    <p-toast  position="top-right" key="myKey3"></p-toast>
    
+  
    
 </div>
 <hr>
-<div class="form-group col-lg-3">
-    <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="filterTerm" autofocus>
-  </div>
+
   <br>
-<table class="table table-hover">
-    <thead style="background-color:slategray">
-        <tr>
-            <th>.Sno</th>
+  <p-table #dt [value]="roles" responsiveLayout="scroll" [globalFilterFields]="['nom']">
+    <ng-template pTemplate="caption">
+		<div class="p-d-flex">
+			<span class="p-input-icon-left p-ml-auto">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"  placeholder="Filter" />
+            </span>
+		</div>
+	</ng-template>
+    <ng-template pTemplate="header" >
+        <tr >
+            <th>.ID</th>
             <th>Role Name</th>
             
             <th colspan="2">Action</th>
-
         </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor='let role of roles | filter:filterTerm '>
+        
+    </ng-template>
+    <ng-template pTemplate="body" let-role >
+        <tr >
             <td>{{role.idRole}} </td>
             <td>{{role.nom}} </td>
             
             
-            <td><button class="btn btn-success btn-sm" (click)='openModal(formModal,role)'>Update Role</button></td>
-            <td><button class="btn btn-danger btn-sm" (click)='deleteRole(role.idRole)' >delete Role</button></td>
+            <td><button pButton icon="pi pi-check" class="p-button-sm p-button-success" label="Update Role" (click)="showDialog(role)"></button></td>
+            <td><button pButton  icon="pi pi-times" class="p-button-sm p-button-danger" label="Delete Role" (click)="open(content,role.idRole)" ></button></td>
         </tr>
-    </tbody>
+    </ng-template>
+    
+</p-table>
 
-</table>
+<ng-template #content let-c="close" let-d="dismiss">    
+    <div class="modal-header">    
+        <h4 class="modal-title" id="modal-basic-title">Confirmation</h4>    
+        <button pButton pRipple class="p-button-danger " aria-label="Close" (click)="d('Cross click')">    
+            <span aria-hidden="true">×</span>    
+        </button>    
+    </div>    
+    <div class="modal-body">    
+        <p>Are you sure to delete this?</p>    
+    </div>    
+    <div class="modal-footer">    
+        <button pButton pRipple class="p-button-warning " (click)="d('Cross click')">Cancel</button>    
+        <button pButton pRipple class="p-button-success " (click)="c('yes')">Yes</button>    
+    </div>    
+</ng-template> 
 
-<ng-template #formModal>
+<p-dialog header="Role Name" [modal]="true" appendTo="body" [(visible)]="display" > 
     <div class="container-fluid">
         <form #updateForm action="javascript:void(0);" (submit)='updateRole(updateForm)' class="p-4 m-3" method="POST">
             <h1 class="display-6">Update Role</h1>
             <hr>
             <div class="form-group m-3">
-                <label for="name">Role Name</label>
-                <input id="name" class="form-control" value="{{selectedRole.nom}}" type="text" name="nom" />
+                <label>Role Name</label>
+                <input  *ngIf="selectedRole"  class="form-control" value="{{selectedRole.nom}}" name="nom"  type="text" />
             </div>
             <div class="mt-4 p-2 m-2">
-                <button type="submit" class="btn btn-info col-lg-5 ">Update Role</button>
+                <button  icon="pi pi-check" type="submit" label="Update Role" pButton pRipple class="p-button-info"></button>
             </div>
         </form>
 
 
     </div>
-</ng-template>
+   
+</p-dialog>

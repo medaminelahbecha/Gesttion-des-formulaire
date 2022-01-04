@@ -22,88 +22,102 @@
 
 
         <div class="mt-3">
-            <button type="submit" class="btn btn-primary col-lg-3">Save Transition</button>
+            <button type="submit" pButton pRipple class=" col-lg-3 " label="Save Transition" icon="pi pi-check" ></button>
         </div>
     </form>
     <br>
     <br>
-    <div *ngIf='error' class="alert alert-danger alert-dismissible fade show col-lg-3" role="alert">
-        <strong>{{error}}</strong> 
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    <div *ngIf='success' class="alert alert-success alert-dismissible fade show col-lg-3" role="alert">
-        <strong>{{success}}</strong> 
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+    <p-toast  position="top-right" key="myKey1"></p-toast>
+    <p-toast  position="top-right" key="myKey2"></p-toast>
+    <p-toast  position="top-right" key="myKey3"></p-toast>
    
 </div>
 <hr>
-<div class="form-group col-lg-3">
-    <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="filterTerm" autofocus>
-  </div>
+
   <br>
-<table class="table table-hover">
-    <thead style="background-color:slategray">
-        <tr>
-            <th>.Sno</th>
+  <p-table #dt [value]="transitions" responsiveLayout="scroll" [globalFilterFields]="['idTransition','etapeActuelle.nom','etapeSuivante.nom','rolePK.nom']" >
+    <ng-template pTemplate="caption">
+		<div class="p-d-flex">
+			<span class="p-input-icon-left p-ml-auto">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"  placeholder="Filter" />
+            </span>
+		</div>
+	</ng-template>
+    <ng-template pTemplate="header" >
+        <tr >
+            <th>.ID</th>
             <th>Etape Actuelle</th>
             <th>Etape Suivante</th>
             <th>Role</th>
             <th >Update</th>
             <th >Delete</th>
-
         </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor='let trans of transitions | filter:filterTerm '>
+        
+    </ng-template>
+    <ng-template pTemplate="body" let-trans >
+        <tr >
             <td>{{trans?.idTransition}} </td>
             <td>{{trans?.etapeActuelle?.nom}} </td>
             <td>{{trans?.etapeSuivante?.nom}} </td>
             <td>{{trans?.rolePK?.nom}} </td>
             
             
-            <td><button class="btn btn-success btn-sm" (click)='openModal(formModal,trans)' >Update Transition</button></td>
-            <td><button class="btn btn-danger btn-sm" (click)='deleteTransition(trans.idTransition)' >delete Transition</button></td>
+            <td><button pButton class="p-button-sm p-button-success" label="Update Transition" icon="pi pi-check"(click)="showDialog(trans)" ></button></td>
+            <td><button pButton class="p-button-sm p-button-danger" label="Delete Transition" icon="pi pi-times" (click)="open(content,trans.idTransition)" ></button></td>
         </tr>
-    </tbody>
+    </ng-template>
+    
+</p-table>
 
-</table>
+<ng-template #content let-c="close" let-d="dismiss">    
+    <div class="modal-header">    
+        <h4 class="modal-title" id="modal-basic-title">Confirmation</h4>    
+        <button type="button" class="btn btn-danger" aria-label="Close" (click)="d('Cross click')">    
+            <span aria-hidden="true">×</span>    
+        </button>    
+    </div>    
+    <div class="modal-body">    
+        <p>Are you sure to delete this?</p>    
+    </div>    
+    <div class="modal-footer">    
+        <button type="button" class="btn btn-warning" (click)="d('Cross click')">Cancel</button>    
+        <button type="button" class="btn btn-success" (click)="c('yes')">Yes</button>    
+    </div>    
+</ng-template>
 
 
-<ng-template #formModal>
+<p-dialog header="Transition details" [modal]="true" appendTo="body" [(visible)]="display" > 
     <div class="container-fluid">
         <form #updateForm action="javascript:void(0);"  (submit)='updateTransition(updateForm)' class="p-4 m-3" method="POST">
             <h1 class="display-6">Update Transition</h1>
             <hr>
             <div class="form-group m-3">
                 <label for="etapeActuelle"> Etape Actuelle</label>
-                <select id="etapeActuelle" class="form-control" name="etapeActuelle">
+                <select id="etapeActuelle" class="form-control" *ngIf="selectedTransition" name="etapeActuelle">
                     <option *ngFor="let etape of etapes" [selected]='selectedTransition.etapeActuelle.idEtape == etape.idEtape' value="{{etape.idEtape}}">{{etape.nom}} </option>  
                 </select>
             </div>
             <div class="form-group m-3">
                 <label for="etapeSuivante"> Etape Suivante</label>
-                <select id="etapeSuivante" class="form-control" name="etapeSuivante">
+                <select id="etapeSuivante" class="form-control" *ngIf="selectedTransition" name="etapeSuivante">
                     <option *ngFor="let etape of etapes" [selected]='selectedTransition.etapeSuivante.idEtape == etape.idEtape' value="{{etape.idEtape}}">{{etape.nom}} </option>   
                 </select>
             </div>
             <div class="form-group m-3">
                 <label for="role"> Role</label>
-                <select id="role" class="form-control" name="role">
+                <select id="role" class="form-control" *ngIf="selectedTransition" name="role">
                     <option *ngFor="let role of roles" [selected]='selectedTransition.rolePK.idRole == role.idRole' value="{{role.idRole}}">{{role.nom}} </option>   
                 </select>
             </div>
     
     
             <div class="mt-4 p-2 m-2">
-                <button type="submit" class="btn btn-info col-lg-5 ">Update Transition</button>
+                <button type="submit" pButton class="p-button-sm p-button-info" label="Update Transition" icon="pi pi-check"></button>
             </div>
         </form>
 
 
     </div>
-</ng-template>
+   
+</p-dialog>

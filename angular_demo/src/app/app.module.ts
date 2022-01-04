@@ -16,6 +16,15 @@ import { UsersComponent } from './components/users/users.component';
 import { TokenInterceptor } from './auth/TokenInterceptor';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
+import { TableModule } from 'primeng/table';
+import {ToastModule} from 'primeng/toast';
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations"
+import {DialogModule} from 'primeng/dialog';
+import {InputTextModule} from 'primeng/inputtext';
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,6 +37,7 @@ import { FormsModule } from '@angular/forms';
     TransitionComponent,
     FormulaireComponent,
     UsersComponent,
+   
     
   ],
   imports: [
@@ -36,7 +46,15 @@ import { FormsModule } from '@angular/forms';
     HttpClientModule,
     ModalModule.forRoot() ,
     Ng2SearchPipeModule,
-    FormsModule
+    FormsModule,
+    ButtonModule,
+    RippleModule,
+    ToastModule,
+    TableModule,
+    BrowserAnimationsModule,
+    DialogModule,
+    InputTextModule
+    
     
   ],
   providers: [{

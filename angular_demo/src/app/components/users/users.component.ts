@@ -3,34 +3,42 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { User } from 'src/app/models/user';
 import { RoleService } from 'src/app/services/roleService/role.service';
 import { UserServiceService } from 'src/app/services/userService/user-service.service';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {MessageService} from 'primeng/api';
+
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
-  styleUrls: ['./users.component.css']
+  styleUrls: ['./users.component.css'],
+  providers: [MessageService]
 })
 export class UsersComponent implements OnInit {
   users: any[] = []
   roles: any[] = []
   selectedUser : User
-  modelRef: BsModalRef;
-  success: string;
-  error: undefined;
-  filterTerm;
-  constructor(private userService :UserServiceService, private modalService: BsModalService , private roleService : RoleService) { }
+ 
+  
+  closeResult: string;
+  display: boolean;
+  display1: boolean;
+  constructor(private userService :UserServiceService, private modalService: BsModalService , private roleService : RoleService, private modaleService: NgbModal,private messageService: MessageService) { }
 
   ngOnInit(): void {
 
     this.collectAllUsers()
     this.collectAllRole()
   }
-
-  openModal(formTemplate, user) {
+  showDialog(user : User) {
     this.selectedUser = user
-    this.modelRef = this.modalService.show(formTemplate)
-    console.log(this.selectedUser.username)
-  }
- 
+    this.display = true;
+}
+  showDialog1(user : User) {
+    this.selectedUser = user
+    this.display1 = true;
+}
+
+  
 
 
   collectAllUsers() {
@@ -56,6 +64,7 @@ export class UsersComponent implements OnInit {
     this.userService.deleteUser(id)
       .subscribe({
         next: (value) => {
+          this.messageService.add({key: 'myKey1', severity:'info', summary: 'Confirmation', detail: 'user supprimé avec succeé'});
           this.collectAllUsers()
         },   
       })
@@ -72,9 +81,8 @@ export class UsersComponent implements OnInit {
    return  this.userService.addRoleUser(this.selectedUser.id,values)
       .subscribe({
         next: (value) => { 
-          this.modelRef.hide();
-          this.success="role  affecter avec succée"
-          this.error=undefined
+         this.display=false
+          this.messageService.add({key: 'myKey3', severity:'success', summary: 'Confirmation', detail: 'Role ajouté avec succeé'});
           this.collectAllUsers()
           
 
@@ -89,12 +97,32 @@ export class UsersComponent implements OnInit {
    return  this.userService.updateUser(this.selectedUser.id,values)
       .subscribe({
         next: (value) => { 
-          this.modelRef.hide();
-          this.success="User "+ username +  " updated avec succée"
-          this.error=undefined
+          this.display1=false
+          this.messageService.add({key: 'myKey2', severity:'warn', summary: 'Confirmation', detail: 'User modifié avec succeé'});
           this.collectAllUsers()
         } 
       })
+  } 
+  
+  open(content, id) {  
+    this.modaleService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then((result) => {  
+      this.closeResult = `Closed with: ${result}`;  
+      if (result === 'yes') {  
+        this.deleteUser(id);  
+      }  
+    }, (reason) => {  
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;  
+    });  
+  }  
+  
+  private getDismissReason(reason: any): string {  
+    if (reason === ModalDismissReasons.ESC) {  
+      return 'by pressing ESC';  
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {  
+      return 'by clicking on a backdrop';  
+    } else {  
+      return `with: ${reason}`;  
+    }  
   }  
 
 }

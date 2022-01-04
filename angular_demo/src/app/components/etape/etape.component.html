@@ -3,7 +3,7 @@
     <form #etapeForm action="javascript:void(0);" (submit)='saveEtape(etapeForm)' class="col-lg-8" method="POST">
         <div class="form-group m-3">
             <label for="name">Etape Name</label>
-            <input id="name" class="form-control" type="text" name="name" required/>
+            <input pInputText  id="name" class="form-control" type="text" name="name" required/>
         </div>
 
         <div class="form-group m-3">
@@ -17,75 +17,90 @@
         
 
         <div class="mt-3">
-            <button type="submit" class="btn btn-primary col-lg-3">Save Etape</button>
+            <button type="submit" pButton  class=" col-lg-3 " icon="pi pi-check" label="Save Etape" ></button>
         </div>
     </form>
     <br>
     <br>
-    <div *ngIf='error' class="alert alert-danger alert-dismissible fade show col-lg-3" role="alert">
-        <strong>{{error}}</strong> 
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    <div *ngIf='success' class="alert alert-success alert-dismissible fade show col-lg-3" role="alert">
-        <strong>{{success}}</strong> 
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+    <p-toast  position="top-right" key="myKey1"></p-toast>
+    <p-toast  position="top-right" key="myKey2"></p-toast>
+    <p-toast  position="top-right" key="myKey3"></p-toast>
    
 </div>
-<div class="form-group col-lg-3">
-    <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="filterTerm" autofocus>
-  </div>
+
   <br>
-<table class="table table-hover">
-    <thead style="background-color:slategray">
-        <tr>
-            <th>.Sno</th>
+
+  <p-table #dt [value]="etapes" responsiveLayout="scroll" [globalFilterFields]="['nom','idEtape','etapeFini']" >
+    <ng-template pTemplate="caption">
+		<div class="p-d-flex">
+			<span class="p-input-icon-left p-ml-auto">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"  placeholder="Filter" />
+            </span>
+		</div>
+	</ng-template>
+    <ng-template pTemplate="header" >
+        <tr >
+            <th>.ID</th>
             <th>Etape Name</th>
             <th>Etape terminé</th>
             
             <th colspan="2">Action</th>
-
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor='let etape of etapes | filter:filterTerm '>
+        
+    </ng-template>
+    <ng-template pTemplate="body" let-etape >
+        <tr >
             <td>{{etape.idEtape}} </td>
             <td>{{etape.nom}} </td>
             <td>{{etape.etapeFini}} </td>
             
             
-            <td><button class="btn btn-success btn-sm" (click)='openModal(formModal,etape)' >Update Etape</button></td>
-            <td><button class="btn btn-danger btn-sm" (click)='deleteEtape(etape.idEtape)' >delete Etape</button></td>
+            <td><button pButton class="p-button-sm p-button-success" label="Update Etape" icon="pi pi-check" (click)="showDialog(etape)" ></button></td>
+            <td><button pButton class="p-button-sm p-button-danger" label="Delete Etape" icon="pi pi-times"(click)="open(content,etape.idEtape)" ></button></td>
         </tr>
-    </tbody>
+    </ng-template>
+    
+</p-table>
 
-</table>
+<ng-template #content let-c="close" let-d="dismiss">    
+    <div class="modal-header">    
+        <h4 class="modal-title" id="modal-basic-title">Confirmation</h4>    
+        <button type="button" class="btn btn-danger" aria-label="Close" (click)="d('Cross click')">    
+            <span aria-hidden="true">×</span>    
+        </button>    
+    </div>    
+    <div class="modal-body">    
+        <p>Are you sure to delete this?</p>    
+    </div>    
+    <div class="modal-footer">    
+        <button type="button" class="btn btn-warning" (click)="d('Cross click')">Cancel</button>    
+        <button type="button" class="btn btn-success" (click)="c('yes')">Yes</button>    
+    </div>    
+</ng-template>
 
-<ng-template #formModal>
+
+<p-dialog header="Etape details" [modal]="true" appendTo="body" [(visible)]="display" > 
     <div class="container-fluid">
         <form #updateForm action="javascript:void(0);" (submit)='updateEtape(updateForm)' class="p-4 m-3" method="POST">
             <h1 class="display-6">Update Etape</h1>
             <hr>
             <div class="form-group m-3">
                 <label for="name">Etape Name</label>
-                <input id="name" class="form-control" type="text" name="name" value="{{selectedEtape.nom}}"/>
+                <input pInputText *ngIf="selectedEtape" id="name" class="form-control" type="text" name="name" value="{{selectedEtape.nom}}"/>
             </div>
             <div class="form-group m-3">
                 <label for="etapeFini"> Etape terminé</label>
-                <select id="etapeFini" class="form-control" name="etapeFini" value="{{selectedEtape.etapeFini}}">
-                    <option  value="true">Yes </option>
-                    <option  value="false">No </option>
+                <select id="etapeFini" *ngIf="selectedEtape" class="form-control" name="etapeFini" >
+                    <option  [selected]='selectedEtape.etapeFini=="Oui"'  value="Oui">Yes </option>
+                    <option [selected]='selectedEtape.etapeFini=="Non"' value="Non">No </option>
                 </select>
             </div>
             <div class="mt-4 p-2 m-2">
-                <button type="submit" class="btn btn-info col-lg-5 ">Update Etape</button>
+                <button type="submit" pButton class=" p-button-info" label="Update Etape" icon="pi pi-check"></button>
             </div>
         </form>
 
 
     </div>
-</ng-template>
+   
+</p-dialog>

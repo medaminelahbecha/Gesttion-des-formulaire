@@ -1,86 +1,100 @@
 <div class="category border m-2 p-4">
     <h1 class="display-4">Users</h1>
 
-    <div class="form-group col-lg-3">
-        <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="filterTerm" autofocus>
-      </div>
+    <p-toast  position="top-right" key="myKey1"></p-toast>
+    <p-toast  position="top-right" key="myKey2"></p-toast>
+    <p-toast  position="top-right" key="myKey3"></p-toast>
       <br>
-<table class="table table-hover">
-    <thead style="background-color:slategray">
-        <tr>
-           
-            <th>User Name</th>
-            <th>Role</th>
+      <p-table #dt [value]="users" responsiveLayout="scroll" [globalFilterFields]="['username','roleFK.nom']" >
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex">
+                <span class="p-input-icon-left p-ml-auto">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"  placeholder="Filter" />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header" >
+            <tr >
+                <th>User Name</th>
+                <th>Role</th>
             
-            <th colspan="3">Action</th>
+                <th colspan="3">Action</th>
+            </tr>
+            
+        </ng-template>
+        <ng-template pTemplate="body" let-user >
+            <tr >
+                <td>{{user.username}} </td>
+                <td> {{user?.roleFK?.nom}}</td>
+                
+                
+                <td><button pButton class="p-button-sm p-button-success" icon="pi pi-check" label="Update User" (click)="showDialog1(user)" ></button></td>
+                <td><button pButton class="p-button-sm p-button-info" icon="pi pi-check" label="Affecter Role" (click)="showDialog(user)" ></button></td>
+                <td><button pButton class="p-button-sm p-button-danger" icon="pi pi-times" label="Delete User" (click)="open(content,user.id)" ></button></td>
+            </tr>
+        </ng-template>
+        
+    </p-table>
 
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor='let user of users | filter:filterTerm '>
-            <td>{{user.username}} </td>
-            <td> {{user?.roleFK?.nom}}</td>
-            
-            
-            <td><button class="btn btn-success btn-sm" (click)='openModal(formModal,user)' >Update User</button></td>
-            <td><button class="btn btn-info btn-sm" (click)='openModal(roleModal,user)' >Affecter Role</button></td>
-            <td><button class="btn btn-danger btn-sm" (click)='deleteUser(user.id)' >delete User</button></td>
-            
-        </tr>
-    </tbody>
-
-</table>
 <br>
 <br>
-<div *ngIf='error' class="alert alert-danger alert-dismissible fade show col-lg-3" role="alert">
-    <strong>{{error}}</strong> 
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-<div *ngIf='success' class="alert alert-success alert-dismissible fade show col-lg-3" role="alert">
-    <strong>{{success}}</strong> 
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+
 
 
 </div>
+<ng-template #content let-c="close" let-d="dismiss">    
+    <div class="modal-header">    
+        <h4 class="modal-title" id="modal-basic-title">Confirmation</h4>    
+        <button type="button" class="btn btn-danger" aria-label="Close" (click)="d('Cross click')">    
+            <span aria-hidden="true">×</span>    
+        </button>    
+    </div>    
+    <div class="modal-body">    
+        <p>Are you sure to delete this?</p>    
+    </div>    
+    <div class="modal-footer">    
+        <button type="button" class="btn btn-warning" (click)="d('Cross click')">Cancel</button>    
+        <button type="button" class="btn btn-success" (click)="c('yes')">Yes</button>    
+    </div>    
+</ng-template>
 
-<ng-template #formModal>
+
+<p-dialog header="User Name" [modal]="true" appendTo="body" [(visible)]="display1" > 
     <div class="container-fluid">
         <form #updateForm action="javascript:void(0);" (submit)='updateUser(updateForm)' class="p-4 m-3" method="POST">
             <h1 class="display-6">Update User</h1>
             <hr>
             <div class="form-group m-3">
                 <label for="name">User Name</label>
-                <input id="name" class="form-control" value="{{selectedUser.username}}" type="text" name="username" />
+                <input pInputText *ngIf="selectedUser" id="name" class="form-control" value="{{selectedUser.username}}" type="text" name="username" />
             </div>
             <div class="mt-4 p-2 m-2">
-                <button type="submit" class="btn btn-info col-lg-5 ">Update User</button>
+                <button type="submit" icon="pi pi-check" label="Update User" pButton class="p-button-sm p-button-info"></button>
             </div>
         </form>
 
 
     </div>
-</ng-template>
-<ng-template #roleModal>
+   
+</p-dialog>
+<p-dialog header="User Role" [modal]="true" appendTo="body" [(visible)]="display" > 
     <div class="container-fluid">
         <form #roleForm action="javascript:void(0);"   (submit)='affecterRole(roleForm)' class="p-4 m-3" method="POST">
             <h1 class="display-6">Affecter Role</h1>
             <hr>
             <div class="form-group m-3">
                 <label for="name">Role Name</label>
-                <select id="role" class="form-control" name="roleFK">
-                    <option *ngFor="let role of roles" value="{{role.idRole}}">{{role.nom}} </option>   
+                <select  id="role" class="form-control" name="roleFK" *ngIf="selectedUser">
+                    <option *ngFor="let role of roles"  [selected]='selectedUser.roleFK.idRole==role.idRole' value="{{role.idRole}}">{{role.nom}} </option>   
                 </select>
             </div>
             <div class="mt-4 p-2 m-2">
-                <button type="submit" class="btn btn-info col-lg-5 ">Save Role</button>
+                <button type="submit" pButton class="p-button-sm p-button-info" icon="pi pi-check" label="Save Role"></button>
             </div>
         </form>
 
 
     </div>
-</ng-template>
+   
+</p-dialog>

@@ -4,30 +4,30 @@ import { Formulaire } from 'src/app/models/formulaire';
 import { EtapeService } from 'src/app/services/etapeService/etape.service';
 import { FormulaireService } from 'src/app/services/formulaire/formulaire.service';
 import { TransitionService } from 'src/app/services/transition/transition.service';
+import {MessageService} from 'primeng/api';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 
 @Component({
   selector: 'app-formulaire',
   templateUrl: './formulaire.component.html',
-  styleUrls: ['./formulaire.component.css']
+  styleUrls: ['./formulaire.component.css'],
+  providers: [MessageService]
 })
 export class FormulaireComponent implements OnInit {
   filterTerm;
   selectedForm: Formulaire
-  modelRef: BsModalRef;
+  
   etapes: any[] = []
   formulaires: any[] = []
-  success: string;
-  error: undefined;
+  
   etapeSuivante: Formulaire[];
-  transitions: import("c:/Users/USER-G/Desktop/angular_demo/src/app/models/transition").Transition[];
-  constructor(private etapeService : EtapeService, private formulaireService : FormulaireService ,private modalService: BsModalService, private transitionService : TransitionService ) { }
+  transitions
+  display: boolean;
+  closeResult: string;
+  constructor(private etapeService : EtapeService, private formulaireService : FormulaireService ,private modaleService: NgbModal ,private modalService: BsModalService, private transitionService : TransitionService ,private messageService: MessageService,) { }
 
-  openModal(formTemplate, form) {
-    this.selectedForm = form
-    this.modelRef = this.modalService.show(formTemplate)
-    
-  }
-
+  
   ngOnInit(): void {
     this.collectAllEtapes()
     this.collectAllFormulaire()
@@ -36,6 +36,10 @@ export class FormulaireComponent implements OnInit {
     console.log(this.formulaires)
   }
 
+  showDialog(form : Formulaire) {
+    this.selectedForm = form
+    this.display = true;
+}
   collectAllEtapes() {
     this.etapeService.getAllEtape()
       .subscribe({
@@ -91,8 +95,7 @@ export class FormulaireComponent implements OnInit {
       next: result=>{
         console.log(result)
         form.reset()
-        this.success="formulaire ajouter avec succée"
-        this.error=undefined
+        this.messageService.add({key: 'myKey1', severity:'success', summary: 'Confirmation', detail: 'Formulaire ajouté avec succeé'});
         this.collectAllFormulaire()
         
       },
@@ -105,11 +108,31 @@ export class FormulaireComponent implements OnInit {
     this.formulaireService.deleteFormulaire(id)
       .subscribe({
         next: (value) => {
+          this.messageService.add({key: 'myKey3', severity:'info', summary: 'Confirmation', detail: 'Formulaire supprimé avec succeé'});
           this.collectAllFormulaire()
         },   
       })
   }
-
+  open(content, id) {  
+    this.modaleService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then((result) => {  
+      this.closeResult = `Closed with: ${result}`;  
+      if (result === 'yes') {  
+        this.deleteFormulaire(id);  
+      }  
+    }, (reason) => {  
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;  
+    });  
+  }  
+  
+  private getDismissReason(reason: any): string {  
+    if (reason === ModalDismissReasons.ESC) {  
+      return 'by pressing ESC';  
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {  
+      return 'by clicking on a backdrop';  
+    } else {  
+      return `with: ${reason}`;  
+    }  
+  }  
 
   updateForm(formTemplate: HTMLFormElement){
     let nom=(<HTMLInputElement>formTemplate.elements.namedItem('nom')).value
@@ -128,9 +151,8 @@ export class FormulaireComponent implements OnInit {
    return  this.formulaireService.updateFormulaire(this.selectedForm.idFormulaire,values)
       .subscribe({
         next: (value) => { 
-          this.modelRef.hide();
-          this.success="formulaire modifier avec succée"
-          this.error=undefined
+          this.display=false;
+          this.messageService.add({key: 'myKey2', severity:'warn', summary: 'Confirmation', detail: 'Formulaire modifié avec succeé'});
           this.collectAllFormulaire()
         } 
       })

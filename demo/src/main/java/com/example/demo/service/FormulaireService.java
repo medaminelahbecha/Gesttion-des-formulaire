@@ -2,11 +2,11 @@ package com.example.demo.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.entities.Etape;
 import com.example.demo.entities.Formulaire;
 import com.example.demo.repositorie.EtapeDao;
 import com.example.demo.repositorie.FormulaireDao;
@@ -25,7 +25,7 @@ public class FormulaireService {
 	public Formulaire addFormulaire(Formulaire form ) {
 		
 		Date dateCreation = new Date();
-		System.out.println(dateCreation);
+		
 
 		form.setDateCreation(dateCreation);
 		return formulaireDao.save(form);
@@ -34,7 +34,7 @@ public class FormulaireService {
 	
 	
 	public List<Formulaire> getAllFormulaire() {	
-		return (List<Formulaire>) formulaireDao.findAll();
+		return formulaireDao.findAll();
 	}
 
 	public void deleteFormulaire(int id ) {
@@ -42,11 +42,15 @@ public class FormulaireService {
 	}
 	
 	
-	public Formulaire updateFormulaire (int id ,Formulaire form ) {
+	public void updateFormulaire (int id ,Formulaire form ) {
 		
 		Date dateModification = new Date();
+		Optional<Formulaire> value = formulaireDao.findById(id);
+		if (value.isPresent()) {
+			Formulaire formToUpdate = value.get();
+			
+
 		
-		Formulaire formToUpdate = formulaireDao.findById(id).get();
 		formToUpdate.setCin(form.getCin());
 		formToUpdate.setEmail(form.getEmail());
 		formToUpdate.setNom(form.getNom());
@@ -54,7 +58,9 @@ public class FormulaireService {
 		formToUpdate.setModifierPar(form.getModifierPar());
 		formToUpdate.setEtape(form.getEtape());
 		formToUpdate.setDateModification(dateModification);
-		return formulaireDao.save(formToUpdate);
+		 formulaireDao.save(formToUpdate);
+		}
+		
 	}
 
 	

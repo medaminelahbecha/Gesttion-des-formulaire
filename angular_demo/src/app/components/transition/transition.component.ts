@@ -8,28 +8,28 @@ import { Transition } from 'src/app/models/transition';
 import { EtapeService } from 'src/app/services/etapeService/etape.service';
 import { RoleService } from 'src/app/services/roleService/role.service';
 import { TransitionService } from 'src/app/services/transition/transition.service';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-transition',
   templateUrl: './transition.component.html',
-  styleUrls: ['./transition.component.css']
+  styleUrls: ['./transition.component.css'],
+  providers: [MessageService]
 })
 export class TransitionComponent implements OnInit {
-  success: string;
-  error: undefined;
-  filterTerm;
-  constructor(private etapeService : EtapeService, private roleService : RoleService , private transitionService : TransitionService,private modalService: BsModalService) { }
+  display: boolean;
+  
+  
+  constructor(private etapeService : EtapeService, private roleService : RoleService , private transitionService : TransitionService,private modalService: BsModalService ,private modaleService: NgbModal ,private messageService: MessageService) { }
   selectedTransition: Transition
-  modelRef: BsModalRef;
+
   etapes: any[] = []
   etapeSuivante: any[] = []
   roles: any[] = []
   transitions: any[] = []
-  openModal(formTemplate, transition) {
-    this.selectedTransition = transition
-    this.modelRef = this.modalService.show(formTemplate)
-    
-  }
+  closeResult: string;
+  
   
   ngOnInit(): void {
     this.collectAllEtapes()
@@ -40,6 +40,11 @@ export class TransitionComponent implements OnInit {
   
   
   }
+
+  showDialog(trans : Transition) {
+    this.selectedTransition = trans
+    this.display = true;
+}
 
   collectAllRoles() {
     this.roleService.getAllRoles()
@@ -86,8 +91,7 @@ export class TransitionComponent implements OnInit {
    next: result=>{
      console.log(result)
      transitionForm.reset()
-     this.success="transition ajouter avec succée"
-     this.error=undefined
+     this.messageService.add({key: 'myKey3', severity:'success', summary: 'Confirmation', detail: 'Transition ajouté avec succeé'});
      this.collectAllTransition()
      
    },
@@ -101,6 +105,7 @@ deleteTransition(id) {
   this.transitionService.deleteTransition(id)
     .subscribe({
       next: (value) => {
+        this.messageService.add({key: 'myKey1', severity:'info', summary: 'Confirmation', detail: 'Transition supprimé avec succeé'});
         this.collectAllTransition()
       },   
     })
@@ -118,15 +123,33 @@ updateTransition(updateForm: HTMLFormElement){
  return  this.transitionService.updateTransition(this.selectedTransition.idTransition,values)
     .subscribe({
       next: (value) => { 
-        this.modelRef.hide();
-        this.success="transition modifier avec succée"
-        this.error=undefined
+        this.display=false
+        this.messageService.add({key: 'myKey2', severity:'warn', summary: 'Confirmation', detail: 'Transition modifié avec succeé'});
         this.collectAllTransition()
       } 
     })
 }  
      
+open(content, id) {  
+  this.modaleService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then((result) => {  
+    this.closeResult = `Closed with: ${result}`;  
+    if (result === 'yes') {  
+      this.deleteTransition(id);  
+    }  
+  }, (reason) => {  
+    this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;  
+  });  
+}  
 
+private getDismissReason(reason: any): string {  
+  if (reason === ModalDismissReasons.ESC) {  
+    return 'by pressing ESC';  
+  } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {  
+    return 'by clicking on a backdrop';  
+  } else {  
+    return `with: ${reason}`;  
+  }  
+}  
   
 
 }

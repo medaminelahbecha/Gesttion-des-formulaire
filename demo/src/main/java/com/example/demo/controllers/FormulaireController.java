@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +28,7 @@ public class FormulaireController {
 	FormulaireService formulaireService ;
 	
 	
-	@RequestMapping(value = "/add", method = RequestMethod.POST)
+	@PostMapping(value = "/add")
 	public Formulaire addFormulaire(@RequestBody Formulaire formulaire) {
 		
 		return formulaireService.addFormulaire(formulaire);
@@ -52,9 +52,9 @@ public class FormulaireController {
 	
 	@PutMapping("/update/{id}") 
 	@ResponseBody 
-	public Formulaire updateFormulaire(@PathVariable("id") int id , @RequestBody Formulaire form) {
+	public void updateFormulaire(@PathVariable("id") int id , @RequestBody Formulaire form) {
 		
-		return formulaireService.updateFormulaire(id, form);
+		 formulaireService.updateFormulaire(id, form);
 	}
 
 
